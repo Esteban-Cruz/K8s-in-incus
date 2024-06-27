@@ -30,11 +30,11 @@ build {
       "FOO" = "bar",
     }
     scripts = [
-      "./scriptsprovisioners/preProvision.sh",
-      "./scriptsprovisioners/containerd.sh",
-      "./scriptsprovisioners/network-configurations.sh",
-      "./scriptsprovisioners/control-plane-prerequisites.sh",
-      "./scriptsprovisioners/init-kubeadm-cluster.sh",
+      "./scripts/preProvision.sh",
+      # "./scripts/containerd.sh",
+      # "./scripts/network-configurations.sh",
+      # "./scripts/control-plane-prerequisites.sh",
+      # "./scripts/init-kubeadm-cluster.sh",
     ]
   }
 }
