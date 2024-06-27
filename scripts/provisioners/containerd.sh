@@ -23,12 +23,14 @@ LOG_FILE="/tmp/log/${SCRIPT_NAME}.log"
 #########################################################
 
 log_message() {
-    local datetime=$(date +"%Y-%m-%d %H:%M:%S")
+    local datetime
+    datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1" | tee -a ${LOG_FILE}
 }
 
 log_error() {
-    local datetime=$(date +"%Y-%m-%d %H:%M:%S")
+    local datetime
+    datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - ERROR - $1" | tee -a ${LOG_FILE} >&2
 }
 
@@ -51,8 +53,8 @@ log_message "Starting ${FILE_NAME} script installer."
 check_prerequisits
 
 log_message "Update package list and install containerd."
-DEBIAN_FRONTEND=noninteractive apt update && \
-    apt install -y containerd || {
+DEBIAN_FRONTEND=noninteractive apt update
+apt install -y containerd || {
         log_error "Failed to install containerd. Exiting."
         exit 1
 }

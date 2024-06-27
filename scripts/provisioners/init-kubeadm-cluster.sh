@@ -24,12 +24,14 @@ LOG_FILE="/tmp/log/init-kubeadm-cluster.log"
 #########################################################
 
 log_message() {
-    local datetime=$(date +"%Y-%m-%d %H:%M:%S")
+    local datetime
+    datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1" | tee -a ${LOG_FILE}
 }
 
 log_error() {
-    local datetime=$(date +"%Y-%m-%d %H:%M:%S")
+    local datetime
+    datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - ERROR - $1" | tee -a ${LOG_FILE} >&2
 }
 
@@ -62,7 +64,7 @@ kubeadm init \
 log_message "Setting up kube config file."
 mkdir -p /root/.kube
 sudo cp -i /etc/kubernetes/admin.conf /root/.kube/config
-sudo chown $(id -u):$(id -g) /root/.kube/config
+sudo chown "$(id -u)":"$(id -g)" /root/.kube/config
 
 log_message "Installing a Pod network add-on."
 kubectl apply -f $POD_NETWORK_ADDON  || {
