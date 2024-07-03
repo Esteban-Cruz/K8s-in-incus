@@ -16,6 +16,7 @@ source "incus" "k8s-master" {
   launch_config = {
     "limits.cpu"    = "2"
     "limits.memory" = "2000MiB"
+    "migration.stateful" = "true"
   }
 
   publish_properties = {
@@ -27,14 +28,15 @@ build {
   sources = ["incus.k8s-master"]
   provisioner "shell" {
     env = {
-      "FOO" = "bar",
+      "CONTROL_PLANE_CIDR" = "10.125.165.111/24",
+      "DEFAULT_GATEWAY" = "10.125.165.1",
     }
     scripts = [
-      "./scripts/preProvision.sh",
-      # "./scripts/containerd.sh",
-      # "./scripts/network-configurations.sh",
-      # "./scripts/control-plane-prerequisites.sh",
-      # "./scripts/init-kubeadm-cluster.sh",
+      "../scripts/provisioners/preProvision.sh",
+      # "../scripts/provisioners/containerd.sh",
+      # "../scripts/provisioners/network-configurations.sh",
+      # "../scripts/provisioners/control-plane-prerequisites.sh",
+      # "../scripts/provisioners/init-kubeadm-cluster.sh",
     ]
   }
 }

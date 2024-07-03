@@ -14,13 +14,10 @@
 #########################################################
 set -euo pipefail
 
-LOG_FILE="/tmp/log/control-plane-prerequisites.log"
-
 KUBERNETES_REPOSITORY_VERSION="v1.30"
 KUBELET_VERSION="1.30.0-1.1"
 KUBEADM_VERSION="1.30.0-1.1"
 KUBECTL_VERSION="1.30.0-1.1"
-
 
 #########################################################
 # Bash functions definition #

@@ -16,7 +16,6 @@ set -euo pipefail
 
 FILE_NAME="containerd.sh"
 SCRIPT_NAME="containerd_installer"
-LOG_FILE="/tmp/log/${SCRIPT_NAME}.log"
 
 #########################################################
 # Bash functions definition #
@@ -25,18 +24,18 @@ LOG_FILE="/tmp/log/${SCRIPT_NAME}.log"
 log_message() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${datetime} - $1" | tee -a ${LOG_FILE}
+    echo "${datetime} - $1"
 }
 
 log_error() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${datetime} - ERROR - $1" | tee -a ${LOG_FILE} >&2
+    echo "${datetime} - ERROR - $1"
 }
 
 root_required() {
     if [[ $EUID -ne 0 ]]; then
-        log_error "This script must be run as root." | tee -a ${LOG_FILE} >&2
+        log_error "This script must be run as root."
         exit 1
     fi
 }

@@ -12,7 +12,7 @@ source "incus" "k8s-master" {
   reuse           = true
   virtual_machine = true
   output_image    = "k8s-node"
-  profile         = "node01"
+  profile         = "def"
   launch_config = {
     "limits.cpu"    = "2"
     "limits.memory" = "2000MiB"
@@ -30,11 +30,11 @@ build {
       "ROLE" = "worker",
     }
     scripts = [
-      "./scripts/preProvision.sh",
-      "./scripts/containerd.sh",
-      "./scripts/network-configurations.sh",
-      "./scripts/control-plane-prerequisites.sh",
-      "./scripts/init-kubeadm-cluster.sh",
+      # "./scripts/preProvision.sh",
+      # "./scripts/containerd.sh",
+      # "./scripts/network-configurations.sh",
+      # "./scripts/control-plane-prerequisites.sh",
+      # "./scripts/init-kubeadm-cluster.sh",
     ]
   }
 }
