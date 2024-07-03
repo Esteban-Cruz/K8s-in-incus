@@ -106,8 +106,9 @@ then
 fi
 
 
-# ./actions/build/tasks/wait-for-instance.sh \
-#   --instance-name="${CONTROL_PLANE_HOSTNAME}"
+./actions/build/tasks/wait-for-instance.sh \
+  --instance-name="${CONTROL_PLANE_HOSTNAME}" \
+  --max-retries=10;
 
 
 # ./actions/incus/incus-exec.sh \
