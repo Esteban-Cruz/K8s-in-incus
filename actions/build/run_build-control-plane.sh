@@ -85,19 +85,25 @@ check_prerequisites
 log_info "Starting Control plane build script."
 
 if ! ./actions/build/tasks/create-incus-profile.sh \
-    --profile-name="${CONTROL_PLANE_HOSTNAME}" \
-    --static-address="${CONTROL_PLANE_ADDRESS_CIDR}" \
-    --gateway="${DEFAULT_GATEWAY_ADDRESS}" ; then
+  --profile-name="${CONTROL_PLANE_HOSTNAME}" \
+  --static-address="${CONTROL_PLANE_ADDRESS_CIDR}" \
+  --gateway="${DEFAULT_GATEWAY_ADDRESS}"; 
+then
   log_error "Failed to run script to create incus profile"
+  exit 1
 fi
 
 
-# ./actions/build/tasks/launch-incus-instance.sh \
-#   --image="${CONTROL_PLANE_BASE_IMAGE}" \
-#   --hostname="${CONTROL_PLANE_HOSTNAME}" \
-#   --profile="${CONTROL_PLANE_HOSTNAME}" \
-#   --cpus="${CONTROL_PLANE_CPUS}" \
-#   --memory="${CONTROL_PLANE_MEMORY}"
+if ! ./actions/build/tasks/launch-incus-instance.sh \
+  --image="${CONTROL_PLANE_BASE_IMAGE}" \
+  --hostname="${CONTROL_PLANE_HOSTNAME}" \
+  --profile="${CONTROL_PLANE_HOSTNAME}" \
+  --cpus="${CONTROL_PLANE_CPUS}" \
+  --memory="${CONTROL_PLANE_MEMORY}";
+then
+  log_error "Failed to run script to launch incus instance"
+  exit 1
+fi
 
 
 # ./actions/build/tasks/wait-for-instance.sh \

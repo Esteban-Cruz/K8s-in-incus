@@ -2,6 +2,7 @@
 
 LOG_DIR="./logs"
 LOG_FILE="${LOG_DIR}/kubernetes-in-incus-$(date +"%Y%m%d").log"
+WRITE_TO_LOGFILE=false
 
 log_info() {
     set +u
@@ -10,10 +11,12 @@ log_info() {
     local message="$1"
     local timestamp
     timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
-    local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
     local raw_log="[$timestamp] $level - $message"
 
-    echo "$log_json" >> "$LOG_FILE"
+    if [ $WRITE_TO_LOGFILE = true ]; then
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
+        echo "$log_json" >> "$LOG_FILE"
+    fi
     echo "$raw_log"
 
     set -u
@@ -27,17 +30,19 @@ log_error() {
     local message="$1"
     local details="$2"
 
-    # local log_details=""
-    # if [ -n "$details" ]; then
-    #     log_details=",\"details\":\"$details\""
-    # fi
+    local log_details=""
+    if [ -n "$details" ]; then
+        log_details=", details: $details"
+    fi
 
     local timestamp
     timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
-    local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"details\":\"$details\"}"
-    local log_raw="[$timestamp] $level - $message: $details"
+    local log_raw="[$timestamp] $level - $message $log_details"
 
-    echo "$log_json" >> "$LOG_FILE"
+    if [ $WRITE_TO_LOGFILE = true ]; then
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"details\":\"$details\"}"
+        echo "$log_json" >> "$LOG_FILE"
+    fi
     echo "$log_raw" >&2
 
     set -u
@@ -51,10 +56,12 @@ log_debug() {
         local message="$1"
         local timestamp
         timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
-        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
         local log_raw="[$timestamp] $level - $message"
 
-        echo "$log_json" >> "$LOG_FILE"
+        if [ $WRITE_TO_LOGFILE = true ]; then
+            local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
+            echo "$log_json" >> "$LOG_FILE"
+        fi
         echo "$log_raw"
     fi
     set -u

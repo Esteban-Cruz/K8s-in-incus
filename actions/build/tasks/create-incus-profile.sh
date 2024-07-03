@@ -1,11 +1,9 @@
 #!/bin/bash
-
+set -euo pipefail
 
 #########################################################
 # Initialization #
 #########################################################
-set -euo pipefail
-source ./common/log_functions.sh
 
 declare PROFILE_NAME
 declare STATIC_ADDRESS
@@ -14,6 +12,7 @@ declare GATEWAY
 #########################################################
 # Parse command options #
 #########################################################
+
 OPTS=$( getopt -ao '' --long profile-name:,static-address:,gateway: -- "$@" )
 eval set -- ${OPTS}
 while true;
@@ -30,6 +29,9 @@ done
 #########################################################
 # Bash functions definition #
 #########################################################
+
+source ./common/log_functions.sh
+
 check_prerequisites() {
   if [[ $# -gt 0 ]] ; then
       log_error "Arguments are not supported for this script."
