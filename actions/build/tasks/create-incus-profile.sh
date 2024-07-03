@@ -36,18 +36,8 @@ check_prerequisites() {
       exit 1
   fi
 
-  if [[ -z "$PROFILE_NAME" ]] ; then
-    log_error "Could not create ip address for the incus profile ${PROFILE_NAME}."
-    exit 1
-  fi
-
-  if [[ -z "$GATEWAY" ]] ; then
-    log_error "Missing required gateway."
-    exit 1
-  fi
-
-  if [[ -z "$IPV4" ]] ; then
-    log_error "Missing ipv4."
+  if [[ -z "$(incus --version)" ]]; then
+    log_error "It appears that incus is not installed in the system, or could not be found." "It is recommended to use incus version 6.0.0."
     exit 1
   fi
 
@@ -57,16 +47,21 @@ check_prerequisites() {
 # Main Script #
 #########################################################
 
-log_message "Attempting to create Incus profile '${PROFILE_NAME}'."
 check_prerequisites
+log_info "Creating and configuring Incus profile '${PROFILE_NAME}'."
 
-if incus profile show "$PROFILE_NAME" &> /dev/null
+if incus profile show ${PROFILE_NAME} &> /dev/null
 then
-    log_message "Incus profile '${PROFILE_NAME}' already exists, skipping profile creation."
+    log_info "Incus profile '${PROFILE_NAME}' already exists, skipping profile creation."
 else
-    log_message "Incus profile '${PROFILE_NAME}' does not exist, creating it."
-    incus profile create ${PROFILE_NAME} &> /dev/null && \
-    incus profile edit ${PROFILE_NAME} <<EOF
+    log_info "Incus profile '${PROFILE_NAME}' does not exist, creating it."
+    if ! command_output=$(incus profile create ${PROFILE_NAME} 2>&1 >/dev/null ); then
+      log_error "Failed to create incus profile ${PROFILE_NAME}." "$command_output"
+      exit 1
+    fi
+fi
+
+if ! command_output=$(incus profile edit "${PROFILE_NAME}" <<EOF 2>&1 >/dev/null
 config:
   cloud-init.user-data: |
     runcmd:
@@ -98,13 +93,12 @@ devices:
     size.state: 2500MiB
 name: ${PROFILE_NAME}
 EOF
+); then
+  log_error "Failed to edit incus profile '${PROFILE_NAME}'" "$command_output"
+  exit 1
 fi
 
-if [[ $? -gt 0 ]] ; then
-  log_error "Could not create Incus profile '${PROFILE_NAME}'."
-fi
-
-log_message "Incus profile '${PROFILE_NAME}' created successfully."
+log_info "Incus profile '${PROFILE_NAME}' configured successfully."
 
 #########################################################
 # Finalization #
