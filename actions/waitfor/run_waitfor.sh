@@ -18,7 +18,7 @@ set -euo pipefail
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -52,36 +52,36 @@ control_plane_is_ready() {
 
 wait_for_control_plane() {
     while ! control_plane_is_ready; do
-        log_message "Control Plane not ready yet, waiting 5 seconds..."
+        log_info "Control Plane not ready yet, waiting 5 seconds..."
         sleep 1
     done
-    log_message "Control plane is ready."
+    log_info "Control plane is ready."
 }
 
 wait_for_weave_interface() {
     while ! incus exec control-plane -- /bin/bash -c "ip link show weave" &> /dev/null
     do
-        log_message "Weave Interface not ready yet, waiting 5 seconds..."
+        log_info "Weave Interface not ready yet, waiting 5 seconds..."
         sleep 1
     done
-    log_message "Ready Fredy!"
+    log_info "Ready Fredy!"
 }
 
 #########################################################
 # Main Script #
 #########################################################
 check_prerequisites
-log_message "Starting run_waitfor.sh script."
+log_info "Starting run_waitfor.sh script."
 
-log_message "Waiting for Weave Interface to be ready."
+log_info "Waiting for Weave Interface to be ready."
 wait_for_weave_interface
 
-log_message "Waiting for Control Plane to be ready."
+log_info "Waiting for Control Plane to be ready."
 wait_for_control_plane
 
 #########################################################
 # Finalization #
 #########################################################
 
-log_message "Script run_waitfor.sh completed successfully."
+log_info "Script run_waitfor.sh completed successfully."
 

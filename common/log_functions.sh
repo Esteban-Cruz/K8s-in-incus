@@ -2,7 +2,7 @@
 
 LOG_DIR="./logs"
 LOG_FILE="${LOG_DIR}/kubernetes-in-incus-$(date +"%Y%m%d").log"
-WRITE_TO_LOGFILE=false
+WRITE_TO_LOGFILE=true
 
 log_info() {
     set +u

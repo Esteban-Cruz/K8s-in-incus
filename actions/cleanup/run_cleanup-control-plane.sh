@@ -14,60 +14,55 @@
 #########################################################
 set -euo pipefail
 
-CONTROL_PLANE_CIDR="10.125.165.10/24"
-DEFAULT_GATEWAY="10.125.165.1"
-MASTER_HOSTNAME="control-plane"
-MASTER_IMAGE=$MASTER_HOSTNAME
-INCUS_PROFILE_NAME="control-plane"
+INSTANCE_NAME="control-plane"
+BASE_IMAGE="control-plane"
+CONTROL_PLANE_PROFILE="control-plane"
 
 #########################################################
 # Bash functions definition #
 #########################################################
 
-log_message() {
-    local datetime
-    datetime=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${datetime} - $1"
-}
-
-log_error() {
-    local datetime
-    datetime=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${datetime} - ERROR - $1"
-}
-
-root_required() {
-    if [[ $EUID -ne 0 ]]; then
-        log_error "This script must be run as root."
-        exit 1
-    fi
-}
+source ./common/log_functions.sh
 
 check_prerequisites() {
-    log_message "No checks to run."
+  if [[ -z "$(incus --version)" ]]; then
+    log_error "It appears that incus is not installed in the system, or could not be found." \
+      "It is recommended to use incus version 6.0.0."
+    exit 1
+  fi
 }
 
 #########################################################
 # Main Script #
 #########################################################
+
 check_prerequisites
-log_message "Starting run_cleanup-control-plane.sh script."
+log_info "Starting clean up script"
 
-if $( incus info ${MASTER_HOSTNAME} &> /dev/null ) ; then
-   incus delete ${MASTER_HOSTNAME} -f
+log_info "Deleting $INSTANCE_NAME instance"
+if ! incus info $INSTANCE_NAME &> /dev/null; then
+    log_info "No instance $INSTANCE_NAME is running"
+elif ! command_output=$(incus delete $INSTANCE_NAME -f 2>&1 >/dev/null); then
+    log_error "Failed to delete instance $INSTANCE_NAME" $command_output
 fi
 
-if $( incus profile show ${INCUS_PROFILE_NAME} &> /dev/null ) ; then
-    incus profile delete ${INCUS_PROFILE_NAME}
+log_info "Deleting profile $CONTROL_PLANE_PROFILE"
+if ! incus profile show $CONTROL_PLANE_PROFILE &> /dev/null; then
+    log_info "No profile $CONTROL_PLANE_PROFILE was found"
+elif ! command_output=$(incus profile delete $CONTROL_PLANE_PROFILE 2>&1 >/dev/null); then
+    log_error "Failed to delete profile $CONTROL_PLANE_PROFILE" "$command_output"
 fi
 
-if $( incus image info ${MASTER_IMAGE} &> /dev/null ) ; then
-    incus image delete ${MASTER_IMAGE}
+log_info "Deleting image $BASE_IMAGE"
+if ! incus image info $BASE_IMAGE &> /dev/null; then
+    log_info "No image $BASE_IMAGE was found"
+elif command_output=$(incus image info ${BASE_IMAGE} 2>&1 >/dev/null); then
+    log_error "Failed to delete image $BASE_IMAGE" "$command_output"
 fi
 
 #########################################################
 # Finalization #
 #########################################################
 
-log_message "Script run_cleanup-control-plane.sh completed successfully."
+log_info "Clean up completed successfully"
 
