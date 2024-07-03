@@ -1,26 +1,25 @@
 #!/bin/bash
-
+set -euo pipefail
 
 #########################################################
 # Initialization #
 #########################################################
-set -euo pipefail
-source ./common/log_functions.sh
 
-declare -a PROFILE_NAME
-declare -a IPV4
-declare -a GATEWAY
+declare PROFILE_NAME
+declare STATIC_ADDRESS
+declare GATEWAY
 
 #########################################################
 # Parse command options #
 #########################################################
-OPTS=$( getopt -ao '' --long profile-name:,ipv4:,gateway: -- "$@" )
+
+OPTS=$( getopt -ao '' --long profile-name:,static-address:,gateway: -- "$@" )
 eval set -- ${OPTS}
 while true;
 do
   case $1 in
     --profile-name)             PROFILE_NAME="$2"                 ; shift 2       ;;
-    --ipv4)                     IPV4="$2"                         ; shift 2       ;;
+    --static-address)           STATIC_ADDRESS="$2"               ; shift 2       ;;
     --gateway)                  GATEWAY="$2"                      ; shift 2       ;;
     --)                                                             shift; break  ;;
     *) >&2 log_error Unsupported option: $1                       ; exit 1        ;;
@@ -30,24 +29,18 @@ done
 #########################################################
 # Bash functions definition #
 #########################################################
+
+source ./common/log_functions.sh
+
 check_prerequisites() {
   if [[ $# -gt 0 ]] ; then
       log_error "Arguments are not supported for this script."
       exit 1
   fi
 
-  if [[ -z "$PROFILE_NAME" ]] ; then
-    log_error "Could not create ip address for the incus profile ${PROFILE_NAME}."
-    exit 1
-  fi
-
-  if [[ -z "$GATEWAY" ]] ; then
-    log_error "Missing required gateway."
-    exit 1
-  fi
-
-  if [[ -z "$IPV4" ]] ; then
-    log_error "Missing ipv4."
+  if [[ -z "$(incus --version)" ]]; then
+    log_error "It appears that incus is not installed in the system, or could not be found." \
+      "It is recommended to use incus version 6.0.0."
     exit 1
   fi
 
@@ -57,16 +50,23 @@ check_prerequisites() {
 # Main Script #
 #########################################################
 
-log_message "Attempting to create Incus profile '${PROFILE_NAME}'."
 check_prerequisites
+log_info "Creating and configuring Incus profile '${PROFILE_NAME}'."
 
-if incus profile show "$PROFILE_NAME" &> /dev/null
+if incus profile show ${PROFILE_NAME} &> /dev/null
 then
-    log_message "Incus profile '${PROFILE_NAME}' already exists, skipping profile creation."
+    log_info "Incus profile '${PROFILE_NAME}' already exists, skipping profile creation."
 else
-    log_message "Incus profile '${PROFILE_NAME}' does not exist, creating it."
-    incus profile create ${PROFILE_NAME} &> /dev/null && \
-    incus profile edit ${PROFILE_NAME} <<EOF
+    log_info "Incus profile '${PROFILE_NAME}' does not exist, creating it."
+    if ! command_output=$(incus profile create ${PROFILE_NAME} 2>&1 >/dev/null ); then
+      log_error "Failed to create incus profile ${PROFILE_NAME}." \
+        "$command_output"
+      exit 1
+    fi
+fi
+
+log_debug "Adding static address '${STATIC_ADDRESS}' and default gateway '${GATEWAY}' to profile '${PROFILE_NAME}' "
+if ! command_output=$(incus profile edit "${PROFILE_NAME}" <<EOF 2>&1 >/dev/null
 config:
   cloud-init.user-data: |
     runcmd:
@@ -77,7 +77,7 @@ config:
       enp5s0: 
         dhcp4: no
         addresses:
-          - ${IPV4}
+          - ${STATIC_ADDRESS}
         routes:
           - to: default
             via: ${GATEWAY}
@@ -98,13 +98,13 @@ devices:
     size.state: 2500MiB
 name: ${PROFILE_NAME}
 EOF
+); then
+  log_error "Failed to edit incus profile '${PROFILE_NAME}'" \
+    "$command_output"
+  exit 1
 fi
 
-if [[ $? -gt 0 ]] ; then
-  log_error "Could not create Incus profile '${PROFILE_NAME}'."
-fi
-
-log_message "Incus profile '${PROFILE_NAME}' created successfully."
+log_info "Incus profile '${PROFILE_NAME}' configured successfully."
 
 #########################################################
 # Finalization #

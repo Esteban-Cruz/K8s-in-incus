@@ -1,16 +1,15 @@
 #!/bin/bash
+set -euo pipefail
 
 #########################################################
 # Initialization #
 #########################################################
-set -euo pipefail
-source ./common/log_functions.sh
 
-IMAGE=
-INSTANCE_HOSTNAME=
-PROFILE=
-CPUS=2
-MEMORY="2000MiB"
+declare IMAGE
+declare INSTANCE_HOSTNAME
+declare PROFILE
+declare CPUS=2
+declare MEMORY="2000MiB"
 
 #########################################################
 # Parse command options #
@@ -35,14 +34,22 @@ done
 # Bash functions definition #
 #########################################################
 
+source ./common/log_functions.sh
+
 check_prerequisites() {
   if [[ $# -gt 0 ]] ; then
       log_error "Arguments are not supported for this script."
       exit 1
   fi
 
+  if [[ -z "$(incus --version)" ]]; then
+    log_error "It appears that incus is not installed in the system, or could not be found." \
+      "It is recommended to use incus version 6.0.0."
+    exit 1
+  fi
+
   if incus info ${INSTANCE_HOSTNAME} &> /dev/null ; then
-    log_error "Can't launch instance '${INSTANCE_HOSTNAME}' since another with the same name is currently running."
+    log_error "Failed to launch instance '${INSTANCE_HOSTNAME}' since another with the same name is currently running."
     exit 1
   fi
 }
@@ -51,22 +58,22 @@ check_prerequisites() {
 # Main Script #
 #########################################################
 
-log_message "Attempting to launch Incus instance '${INSTANCE_HOSTNAME}'..."
 check_prerequisites
+log_info "Launching Incus instance '${INSTANCE_HOSTNAME}'."
 
-incus launch ${IMAGE} ${INSTANCE_HOSTNAME} \
+log_debug "Instance details: image=${IMAGE}, hostname=${INSTANCE_HOSTNAME}, profile=${PROFILE}, cpus=${CPUS}, memory=${MEMORY}"
+if ! command_output=$(incus launch ${IMAGE} ${INSTANCE_HOSTNAME} \
   --profile ${PROFILE} \
   --vm \
   --config limits.cpu=${CPUS} \
   --config limits.memory=${MEMORY} \
-  --config migration.stateful="true"
-
-if [[ $? -gt 0 ]] ; then
-  log_error "Could not launch Incus instance '${INSTANCE_HOSTNAME}'."
+  --config migration.stateful="true" 2>&1 >/dev/null )
+then
+  log_error "Could not launch Incus instance '${INSTANCE_HOSTNAME}'." "$command_output"
   exit 1
 fi
 
-log_message "Incus instance '${INSTANCE_HOSTNAME}' launched successfully."
+log_info "Incus instance '${INSTANCE_HOSTNAME}' launched successfully."
 
 #########################################################
 # Finalization #

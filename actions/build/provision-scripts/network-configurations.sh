@@ -18,7 +18,7 @@ set -euo pipefail
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -47,10 +47,10 @@ check_prerequisites() {
 #########################################################
 
 check_prerequisites
-log_message "Installing and configuring prerequisites."
+log_info "Installing and configuring prerequisites."
 
 # --------------------------------------------------------
-log_message "Adding necessary Kernel modules."
+log_info "Adding necessary Kernel modules."
 # 
 # Instructions from:
 # - https://kubernetes.io/docs/setup/production-environment/container-runtimes/#install-and-configure-prerequisites
@@ -66,7 +66,7 @@ modprobe overlay || log_error "Failed to add kernel module 'overlay'"
 modprobe br_netfilter || log_error "Failed to add kernel module 'br_netfilter'"
 
 # --------------------------------------------------------
-log_message "Enable IPv4 packet forwarding."
+log_info "Enable IPv4 packet forwarding."
 # 
 # Instructions from:
 # - https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional
@@ -80,13 +80,13 @@ net.ipv4.ip_forward = 1
 EOF
 
 # Apply sysctl params without reboot
-log_message "Applying sysctl params."
+log_info "Applying sysctl params."
 sysctl --system || log_error "Failed applying sysctl params."
 
 #########################################################
 # Finalization #
 #########################################################
 
-log_message "Successfully installed and configured prerequisites."
+log_info "Successfully installed and configured prerequisites."
 
 exit 0

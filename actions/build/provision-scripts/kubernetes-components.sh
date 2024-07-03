@@ -25,7 +25,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -82,27 +82,27 @@ done
 # Main Script #
 #########################################################
 
-log_message "Installing Kubernetes components"
+log_info "Installing Kubernetes components"
 
 # --------------------------------------------------------
-log_message "Update apt packages and install Kubernetes components"
+log_info "Update apt packages and install Kubernetes components"
 # 
 # Instructions from:
 # - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 
-log_message "Updating apt package index and installing packages needed to use the Kubernetes apt repository"
+log_info "Updating apt package index and installing packages needed to use the Kubernetes apt repository"
 apt update -y \
     || log_error "Failed to update apt package index."
 apt install -y apt-transport-https ca-certificates curl gnupg \
     || log_error "Failed to install prerequisite packages."
 
 # Download public signing key for the Kubernetes package repositories
-log_message "Downloading public signing key for the Kubernetes package repositories."
+log_info "Downloading public signing key for the Kubernetes package repositories."
 curl -fsSL https://pkgs.k8s.io/core:/stable:/${KUBERNETES_REPOSITORY_VERSION}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg \
     || log_error "Failed to download and install Kubernetes signing key."
 
 # Add Kubernetes apt repository
-log_message "Adding appropriate Kubernetes apt repository."
+log_info "Adding appropriate Kubernetes apt repository."
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/${KUBERNETES_REPOSITORY_VERSION}/deb/ /" | tee /etc/apt/sources.list.d/kubernetes.list \
     || log_error "Failed to add Kubernetes apt repository."
 
@@ -112,7 +112,7 @@ apt update -y \
 
 # Install Kubernetes Components
 if [ -n "$KUBEADM_VERSION" ]; then
-    log_message "Installing kubeadm='${KUBEADM_VERSION}'"
+    log_info "Installing kubeadm='${KUBEADM_VERSION}'"
     apt install -y kubeadm="${KUBEADM_VERSION}" \
         || log_error "Failed to install 'kubeadm=${KUBEADM_VERSION}'"
     apt-mark hold kubeadm \
@@ -120,7 +120,7 @@ if [ -n "$KUBEADM_VERSION" ]; then
 fi
 
 if [ -n "$KUBELET_VERSION" ]; then
-    log_message "Installing kubelet='${KUBELET_VERSION}'"
+    log_info "Installing kubelet='${KUBELET_VERSION}'"
     apt install -y kubelet="${KUBELET_VERSION}" \
         || log_error "Failed to install 'kubelet=${KUBELET_VERSION}'"
     apt-mark hold kubelet \
@@ -137,7 +137,7 @@ if [ -n "${KUBECTL_VERSION}" ]; then
 fi
 
 if [ "${PULL_IMAGES}" = "true" ]; then
-    log_message "Pulling control plane images."
+    log_info "Pulling control plane images."
     kubeadm config images pull || log_error "Failed to pull Kubernetes images."
 fi
 
@@ -145,5 +145,5 @@ fi
 # Finalization #
 #########################################################
 
-log_message "Successfully installed Kubernetes components"
+log_info "Successfully installed Kubernetes components"
 

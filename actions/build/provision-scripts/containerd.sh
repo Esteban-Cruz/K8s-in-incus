@@ -20,7 +20,7 @@ declare -a CONTAINERD_VERSION
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -64,10 +64,10 @@ done
 #########################################################
 
 check_prerequisites
-log_message "Starting Containerd installation and configuration."
+log_info "Starting Containerd installation and configuration."
 
 # --------------------------------------------------------
-log_message "Setting up Docker's apt repository."
+log_info "Setting up Docker's apt repository."
 # 
 # Instructions from:
 # - https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
@@ -106,7 +106,7 @@ if [ -n "$CONTAINERD_VERSION" ]; then
     if [ -n "$version_found" ]; then
         # If version is found, store it in a variable
         selected_version="$version_found"
-        log_message "Found Containerd version ${selected_version}. Proceeding with installation."
+        log_info "Found Containerd version ${selected_version}. Proceeding with installation."
         apt install -y containerd=${selected_version}
     else
         log_error "Containerd version ${CONTAINERD_VERSION} could not be found."
@@ -116,10 +116,10 @@ else
     apt install -y containerd
 fi
 
-log_message "Containerd setup completed successfully."
+log_info "Containerd setup completed successfully."
 
 # --------------------------------------------------------
-log_message "Configuring the systemd cgroup driver."
+log_info "Configuring the systemd cgroup driver."
 # 
 # Instructions from:
 # - https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
@@ -143,11 +143,11 @@ sed -i.bak -r "s/SystemdCgroup = false/SystemdCgroup = true/" "$config_dir/confi
 systemctl restart containerd || \
     log_error "Failed to restart containerd service."
 
-log_message "Systemd cgroup driver configured successfully."
+log_info "Systemd cgroup driver configured successfully."
 
 #########################################################
 # Finalization #
 #########################################################
 
-log_message "Successful Containerd installation and configuration."
+log_info "Successful Containerd installation and configuration."
 exit 0

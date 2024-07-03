@@ -82,39 +82,51 @@ POD_NETWORK_ADDON="https://reweave.azurewebsites.net/k8s/v1.30/net.yaml"
 #########################################################
 
 check_prerequisites
-log_message "Starting control plain build script."
+log_info "Starting Control plane build script."
 
-./actions/build/tasks/create-incus-profile.sh \
+if ! ./actions/incus/create-profile.sh \
   --profile-name="${CONTROL_PLANE_HOSTNAME}" \
-  --ipv4="${CONTROL_PLANE_ADDRESS_CIDR}" \
-  --gateway="${DEFAULT_GATEWAY_ADDRESS}"
+  --static-address="${CONTROL_PLANE_ADDRESS_CIDR}" \
+  --gateway="${DEFAULT_GATEWAY_ADDRESS}"; 
+then
+  log_error "Failed to run script to create incus profile"
+  exit 1
+fi
 
 
-./actions/build/tasks/launch-incus-instance.sh \
+if ! ./actions/incus/launch-instance.sh \
   --image="${CONTROL_PLANE_BASE_IMAGE}" \
   --hostname="${CONTROL_PLANE_HOSTNAME}" \
   --profile="${CONTROL_PLANE_HOSTNAME}" \
   --cpus="${CONTROL_PLANE_CPUS}" \
-  --memory="${CONTROL_PLANE_MEMORY}"
+  --memory="${CONTROL_PLANE_MEMORY}";
+then
+  log_error "Failed to run script to launch incus instance"
+  exit 1
+fi
 
 
-./actions/build/tasks/wait-for-instance.sh \
-  --instance-name="${CONTROL_PLANE_HOSTNAME}"
+./actions/incus/wait-for-instance.sh \
+  --instance-name="${CONTROL_PLANE_HOSTNAME}" \
+  --max-retries=10;
 
 
+log_info "Install Containerd"
 ./actions/incus/incus-exec.sh \
-  --incus-cwd "/tmp/kubeadm/provisioning" \
+  --incus-cwd "/tmp/kubeadm/provision" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/containerd.sh" \
   --containerd-version "${CONTROL_PLANE_CONTAINERD_VERSION}"
 
 
+log_info "Configure Incus network"
 ./actions/incus/incus-exec.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/network-configurations.sh" \
 
 
+log_info "Installing kubernetes components"
 ./actions/incus/incus-exec.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
@@ -126,6 +138,7 @@ log_message "Starting control plain build script."
   --pull-images "true"
 
 
+log_info "Initializing Kubernetes cluster with Kubeadm"
 ./actions/incus/incus-exec.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
@@ -135,22 +148,21 @@ log_message "Starting control plain build script."
   --network-addon "${POD_NETWORK_ADDON}"
 
 
+log_info "Applying customizations"
 ./actions/incus/incus-exec.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/customizations.sh"
 
-# log_message "Creating stateful snapshot."
+# log_info "Creating stateful snapshot."
 # incus snapshot create ${MASTER_HOSTNAME} ${MASTER_HOSTNAME} --stateful
 
-# log_message "Publishing ${MASTER_HOSTNAME} as image."
+# log_info "Publishing ${MASTER_HOSTNAME} as image."
 # incus stop ${MASTER_HOSTNAME} --stateful
 # incus publish ${MASTER_HOSTNAME} --alias ${MASTER_HOSTNAME} --reuse --force-local
-
-log_message "Image built!!! :-)"
 
 #########################################################
 # Finalization #
 #########################################################
 
-log_message "Control plain built successfully."
+log_info "Control Plane built successfully!!! :-)"

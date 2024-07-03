@@ -1,20 +1,81 @@
 #!/bin/bash
 
-log_message() {
-    local datetime
-    datetime=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${datetime} - $1"
+LOG_DIR="./logs"
+LOG_FILE="${LOG_DIR}/kubernetes-in-incus-$(date +"%Y%m%d").log"
+WRITE_TO_LOGFILE=true
+
+log_info() {
+    set +u
+
+    local level="INFO"
+    local message="$1"
+    local timestamp
+    timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
+    local raw_log="[$timestamp] $level - $message"
+
+    if [ $WRITE_TO_LOGFILE = true ]; then
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
+        echo "$log_json" >> "$LOG_FILE"
+    fi
+    echo "$raw_log"
+
+    set -u
+}
+
+log_warning() {
+    local level="WARNING"
+    local message="$1"
+    local timestamp
+    timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
+    local log_entry="[$timestamp] $level - $message"
+
+    if [ $WRITE_TO_LOGFILE = true ]; then
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
+        echo "$log_json" >> "$LOG_FILE"
+    fi
+    echo "$log_entry" >&2
 }
 
 log_error() {
-    local datetime
-    datetime=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${datetime} - ERROR - $1"  >&2
+    set +u
+    
+    local level="ERROR"
+    local message="$1"
+    local details="$2"
+
+    local log_details=""
+    if [ -n "$details" ]; then
+        log_details=", details: $details"
+    fi
+
+    local timestamp
+    timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
+    local log_raw="[$timestamp] $level - $message $log_details"
+
+    if [ $WRITE_TO_LOGFILE = true ]; then
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"details\":\"$details\"}"
+        echo "$log_json" >> "$LOG_FILE"
+    fi
+    echo "$log_raw" >&2
+
+    set -u
 }
 
-root_required() {
-    if [[ $EUID -ne 0 ]]; then
-        log_error "This script must be run as root."
-        exit 1
+
+log_debug() {
+    set +u
+    if [ "$DEBUG" = true ]; then
+        local level="DEBUG"
+        local message="$1"
+        local timestamp
+        timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
+        local log_raw="[$timestamp] $level - $message"
+
+        if [ $WRITE_TO_LOGFILE = true ]; then
+            local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
+            echo "$log_json" >> "$LOG_FILE"
+        fi
+        echo "$log_raw"
     fi
+    set -u
 }

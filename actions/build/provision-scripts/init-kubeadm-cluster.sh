@@ -42,7 +42,7 @@ done
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -72,7 +72,7 @@ check_prerequisites() {
 
 
 # --------------------------------------------------------
-log_message "Initializing control-plane node with kubeadm."
+log_info "Initializing control-plane node with kubeadm."
 # 
 # Instructions from:
 # - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#initializing-your-control-plane-node
@@ -81,18 +81,18 @@ log_message "Initializing control-plane node with kubeadm."
 # - https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/#without-internet-connection
 # 
 
-log_message "Setting hostname to $NODE_NAME"
+log_info "Setting hostname to $NODE_NAME"
 hostname "$NODE_NAME" || log_error "Failed to set hostname."
 
 # Initialize Kubernetes control-plane with kubeadm
-log_message "Running 'kubeadm init'..."
+log_info "Running 'kubeadm init'..."
 kubeadm init \
     --apiserver-advertise-address="$APISERVER_ADVERTISE_ADDRESS" \
     --node-name="$NODE_NAME" \
     || log_error "Failed to initialize Kubernetes control-plane."
 
 # Set up kube config file
-log_message "Setting up kube config file."
+log_info "Setting up kube config file."
 
 # Create kube config directory if it doesn't exist
 mkdir -p /root/.kube
@@ -106,7 +106,7 @@ chown "$(id -u)":"$(id -g)" /root/.kube/config \
     || log_error "Failed to set ownership of /root/.kube/config."
 
 # --------------------------------------------------------
-log_message "Installing Pod network add-on from $POD_NETWORK_ADDON."
+log_info "Installing Pod network add-on from $POD_NETWORK_ADDON."
 # 
 # Instructions from:
 # - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
@@ -123,5 +123,5 @@ kubectl apply -f "$POD_NETWORK_ADDON" \
 # Finalization #
 #########################################################
 
-log_message "Kubernetes control-plane initialization completed successfully."
+log_info "Kubernetes control-plane initialization completed successfully."
 exit 0
