@@ -1,10 +1,10 @@
 #!/bin/bash
+set -euo pipefail
 
 #########################################################
 # Initialization #
 #########################################################
 
-set -euo pipefail
 DEFAULT_UID=0
 DEFAULT_INCUS_CWD="/"
 
@@ -29,7 +29,6 @@ EOF
 # Parse command options #
 #########################################################
 
-# Defaults
 USER_ID="${DEFAULT_UID}"
 INCUS_CWD="${DEFAULT_INCUS_CWD}"
 
@@ -51,14 +50,21 @@ done
 source ./common/log_functions.sh
 
 check_prerequisites() {
-    if [[ -z "${INSTANCE_NAME}" ]]; then
-      log_error "Missing required argument '--instance-name'."
-      usage ; exit 1
-    fi
-    if [[ -z "${SCRIPT}" ]]; then
-      log_error "At least one script is required."
-      usage ; exit 1
-    fi
+  if [[ -z "${INSTANCE_NAME}" ]]; then
+    log_error "Missing required argument '--instance-name'."
+    usage ; exit 1
+  fi
+
+  if [[ -z "${SCRIPT}" ]]; then
+    log_error "At least one script is required."
+    usage ; exit 1
+  fi
+
+  if [[ -z "$(incus --version)" ]]; then
+    log_error "It appears that incus is not installed in the system, or could not be found." \
+      "It is recommended to use incus version 6.0.0."
+    exit 1
+  fi
 }
 
 #########################################################
@@ -66,27 +72,39 @@ check_prerequisites() {
 #########################################################
 
 check_prerequisites
+log_info "Executing script against incus instance"
 
-log_message "Execute the script on incus instance"
 remote_script="${INCUS_CWD}/$(basename "${SCRIPT}")"
 
-# Push the script to the remote instance
-# log_message "DEBUG: incus file push "${SCRIPT}" "${INSTANCE_NAME}${remote_script}" --uid "${USER_ID}" --create-dirs"
-incus file push "${SCRIPT}" "${INSTANCE_NAME}${remote_script}" --uid "${USER_ID}" --create-dirs \
-  || log_error "Failed to push file ${SCRIPT}"
+log_debug "Pushing script '$SCRIPT' to $INSTANCE_NAME:$INCUS_CWD using uid $USER_ID."
+log_debug "Full path to script inside the ${INSTANCE_NAME} instance: '${remote_script}'"
+if ! command_output=$(incus file push "${SCRIPT}" "${INSTANCE_NAME}${remote_script}" --uid "${USER_ID}" --create-dirs 2>&1 >/dev/null);
+then
+  log_error "Failed to push script ${SCRIPT} to instance $INSTANCE_NAME." "$command_output"
+  exit 1
+fi
 
-# Construct the command to execute the script
+log_debug "Constructing the command to execute the script"
 command="${remote_script}"
 for flag in "${FLAGS[@]}"; do
   command+=" ${flag}"
 done
 
-# Execute the script on the remote instance
-incus exec "${INSTANCE_NAME}" -- /bin/bash -c "${command}" ||
-  { 
-    log_error "Failed to run script ${remote_script}"
-  }
+log_debug "Running against instance $INSTANCE_NAME the following command: '/bin/bash -c ${command}'"
+if ! command_output=$(incus exec "${INSTANCE_NAME}" -- /bin/bash -c "${command}" 2>&1 >/dev/null);
+then
+  log_error "Failed to run script ${remote_script}" "$command_output"
+  exit 1
+fi
+
+log_debug "Removing script from $INSTANCE_NAME after its execution"
+if ! command_output=$(incus exec "${INSTANCE_NAME}" -- /bin/bash -c "rm ${remote_script}" 2>&1 >/dev/null);
+then
+  log_warning "Failed to remove script $remote_script from $INSTANCE_NAME after its executing"
+fi
 
 #########################################################
 # Finalization #
 #########################################################
+
+log_info "Successfully executed script against incus instance"

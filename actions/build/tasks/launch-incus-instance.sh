@@ -61,8 +61,7 @@ check_prerequisites() {
 check_prerequisites
 log_info "Launching Incus instance '${INSTANCE_HOSTNAME}'."
 
-log_debug "Instance details: image=${IMAGE}, hostname=${INSTANCE_HOSTNAME}, profile=${PROFILE}, cpus=${CPUS}, \
-  memory=${MEMORY}"
+log_debug "Instance details: image=${IMAGE}, hostname=${INSTANCE_HOSTNAME}, profile=${PROFILE}, cpus=${CPUS}, memory=${MEMORY}"
 if ! command_output=$(incus launch ${IMAGE} ${INSTANCE_HOSTNAME} \
   --profile ${PROFILE} \
   --vm \

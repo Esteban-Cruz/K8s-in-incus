@@ -111,43 +111,43 @@ fi
   --max-retries=10;
 
 
-# ./actions/incus/incus-exec.sh \
-#   --incus-cwd "/tmp/kubeadm/provisioning" \
-#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-#   --script "./actions/build/provision-scripts/containerd.sh" \
-#   --containerd-version "${CONTROL_PLANE_CONTAINERD_VERSION}"
+./actions/incus/incus-exec.sh \
+  --incus-cwd "/tmp/kubeadm/provision" \
+  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+  --script "./actions/build/provision-scripts/containerd.sh" \
+  --containerd-version "${CONTROL_PLANE_CONTAINERD_VERSION}"
 
 
-# ./actions/incus/incus-exec.sh \
-#   --incus-cwd "/tmp/kubeadm/provisioning" \
-#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-#   --script "./actions/build/provision-scripts/network-configurations.sh" \
+./actions/incus/incus-exec.sh \
+  --incus-cwd "/tmp/kubeadm/provisioning" \
+  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+  --script "./actions/build/provision-scripts/network-configurations.sh" \
 
 
-# ./actions/incus/incus-exec.sh \
-#   --incus-cwd "/tmp/kubeadm/provisioning" \
-#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-#   --script "./actions/build/provision-scripts/kubernetes-components.sh" \
-#   --repository-version "${CONTROL_PLANE_KUBERNETES_REPOSITORY_VERSION}" \
-#   --kubeadm "${CONTROL_PLANE_KUBEADM_VERSION}" \
-#   --kubelet "${CONTROL_PLANE_KUBELET_VERSION}" \
-#   --kubectl "${CONTROL_PLANE_KUBECTL_VERSION}" \
-#   --pull-images "true"
+./actions/incus/incus-exec.sh \
+  --incus-cwd "/tmp/kubeadm/provisioning" \
+  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+  --script "./actions/build/provision-scripts/kubernetes-components.sh" \
+  --repository-version "${CONTROL_PLANE_KUBERNETES_REPOSITORY_VERSION}" \
+  --kubeadm "${CONTROL_PLANE_KUBEADM_VERSION}" \
+  --kubelet "${CONTROL_PLANE_KUBELET_VERSION}" \
+  --kubectl "${CONTROL_PLANE_KUBECTL_VERSION}" \
+  --pull-images "true"
 
 
-# ./actions/incus/incus-exec.sh \
-#   --incus-cwd "/tmp/kubeadm/provisioning" \
-#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-#   --script "./actions/build/provision-scripts/init-kubeadm-cluster.sh" \
-#   --node-name "${CONTROL_PLANE_HOSTNAME}" \
-#   --apiserver-advertise-address "${CONTROL_PLANE_ADDRESS}" \
-#   --network-addon "${POD_NETWORK_ADDON}"
+./actions/incus/incus-exec.sh \
+  --incus-cwd "/tmp/kubeadm/provisioning" \
+  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+  --script "./actions/build/provision-scripts/init-kubeadm-cluster.sh" \
+  --node-name "${CONTROL_PLANE_HOSTNAME}" \
+  --apiserver-advertise-address "${CONTROL_PLANE_ADDRESS}" \
+  --network-addon "${POD_NETWORK_ADDON}"
 
 
-# ./actions/incus/incus-exec.sh \
-#   --incus-cwd "/tmp/kubeadm/provisioning" \
-#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-#   --script "./actions/build/provision-scripts/customizations.sh"
+./actions/incus/incus-exec.sh \
+  --incus-cwd "/tmp/kubeadm/provisioning" \
+  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+  --script "./actions/build/provision-scripts/customizations.sh"
 
 # # log_info "Creating stateful snapshot."
 # # incus snapshot create ${MASTER_HOSTNAME} ${MASTER_HOSTNAME} --stateful
@@ -162,4 +162,4 @@ fi
 # Finalization #
 #########################################################
 
-log_info "Control plain built successfully."
+log_info "Control Plane built successfully."
