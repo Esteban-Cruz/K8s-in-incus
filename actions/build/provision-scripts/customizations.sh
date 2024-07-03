@@ -38,7 +38,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     echo "No checks to run."
 }
 
@@ -46,17 +46,12 @@ check_prerequisits() {
 # Main Script #
 #########################################################
 
-# check_prerequisits
+# check_prerequisites
 log_message "Applying customizations."
 
 log_message "Removing taint from Control Plane node."
 kubectl taint node control-plane node-role.kubernetes.io/control-plane:NoSchedule- &> /dev/null \
     || log_error "Could not remove taint from Control Plane node."
-
-# log_message "Remove taint from Control Plane node."
-# if ! $(kubectl taint node control-plane node-role.kubernetes.io/control-plane:NoSchedule- &> /dev/null) ; then
-#     log_error "Could not remove taint from Control Plane node."
-# fi
 
 # TODO(Esteban Cruz): Does this have to be here?
 log_message "Configuring containerd runtime and image endpoints."

@@ -35,7 +35,7 @@ done
 # Bash functions definition #
 #########################################################
 
-check_prerequisits() {
+check_prerequisites() {
   if [[ $# -gt 0 ]] ; then
       log_error "Arguments are not supported for this script."
       exit 1
@@ -52,7 +52,7 @@ check_prerequisits() {
 #########################################################
 
 log_message "Attempting to launch Incus instance '${INSTANCE_HOSTNAME}'..."
-check_prerequisits
+check_prerequisites
 
 incus launch ${IMAGE} ${INSTANCE_HOSTNAME} \
   --profile ${PROFILE} \

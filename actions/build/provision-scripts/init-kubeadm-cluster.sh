@@ -62,7 +62,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
 }
 

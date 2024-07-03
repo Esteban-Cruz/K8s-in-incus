@@ -41,7 +41,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
 }
 
@@ -50,7 +50,7 @@ check_prerequisits() {
 #########################################################
 
 log_message "Starting $FILE_NAME script installer."
-check_prerequisits
+check_prerequisites
 
 log_message "Adding necessary Kernel modules."
 cat <<EOF | tee /etc/modules-load.d/k8s.conf

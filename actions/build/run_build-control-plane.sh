@@ -47,6 +47,10 @@ get_nextip(){
     echo "$next_ip"
 }
 
+check_prerequisites() {
+  true
+}
+
 #########################################################
 # Defaults #
 #########################################################
@@ -77,7 +81,7 @@ POD_NETWORK_ADDON="https://reweave.azurewebsites.net/k8s/v1.30/net.yaml"
 # Main Script #
 #########################################################
 
-check_prerequisits
+check_prerequisites
 log_message "Starting control plain build script."
 
 ./actions/build/tasks/create-incus-profile.sh \

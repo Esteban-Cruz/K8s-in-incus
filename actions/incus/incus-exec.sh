@@ -50,7 +50,7 @@ done
 
 source ./common/log_functions.sh
 
-check_prerequisits() {
+check_prerequisites() {
     if [[ -z "${INSTANCE_NAME}" ]]; then
       log_error "Missing required argument '--instance-name'."
       usage ; exit 1
@@ -65,13 +65,13 @@ check_prerequisits() {
 # Main Script #
 #########################################################
 
-check_prerequisits
+check_prerequisites
 
 log_message "Execute the script on incus instance"
 remote_script="${INCUS_CWD}/$(basename "${SCRIPT}")"
 
 # Push the script to the remote instance
-log_message "DEBUG: incus file push "${SCRIPT}" "${INSTANCE_NAME}${remote_script}" --uid "${USER_ID}" --create-dirs"
+# log_message "DEBUG: incus file push "${SCRIPT}" "${INSTANCE_NAME}${remote_script}" --uid "${USER_ID}" --create-dirs"
 incus file push "${SCRIPT}" "${INSTANCE_NAME}${remote_script}" --uid "${USER_ID}" --create-dirs \
   || log_error "Failed to push file ${SCRIPT}"
 

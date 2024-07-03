@@ -40,7 +40,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
 }
 
@@ -49,7 +49,7 @@ check_prerequisits() {
 #########################################################
 
 log_message "Starting ${FILE_NAME} script installer."
-check_prerequisits
+check_prerequisites
 
 log_message "Update package list and install containerd."
 DEBIAN_FRONTEND=noninteractive apt update

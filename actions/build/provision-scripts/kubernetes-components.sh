@@ -45,7 +45,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
     if [ -z "$KUBERNETES_REPOSITORY_VERSION" ]; then
         log_error "Missing required argument: --repository-version"

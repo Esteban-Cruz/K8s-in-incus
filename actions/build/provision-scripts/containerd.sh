@@ -40,7 +40,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
 }
 
@@ -63,7 +63,7 @@ done
 # Main Script #
 #########################################################
 
-check_prerequisits
+check_prerequisites
 log_message "Starting Containerd installation and configuration."
 
 # --------------------------------------------------------

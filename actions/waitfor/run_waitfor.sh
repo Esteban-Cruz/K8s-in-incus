@@ -37,7 +37,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     echo "No checks to run."
 }
 
@@ -70,7 +70,7 @@ wait_for_weave_interface() {
 #########################################################
 # Main Script #
 #########################################################
-check_prerequisits
+check_prerequisites
 log_message "Starting run_waitfor.sh script."
 
 log_message "Waiting for Weave Interface to be ready."

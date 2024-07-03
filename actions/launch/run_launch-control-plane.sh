@@ -42,7 +42,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     if ! $(incus profile show ${INCUS_PROFILE_NAME} &> /dev/null )
     then
         log_error "Incus profile ${INCUS_PROFILE_NAME} not found."
@@ -58,7 +58,7 @@ check_prerequisits() {
 #########################################################
 # Main Script #
 #########################################################
-check_prerequisits
+check_prerequisites
 log_message "Starting run_launch-control-plane.sh script."
 
 incus launch ${MASTER_IMAGE} ${MASTER_HOSTNAME} \

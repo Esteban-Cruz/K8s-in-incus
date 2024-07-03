@@ -42,7 +42,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
 }
 
@@ -51,7 +51,7 @@ check_prerequisits() {
 #########################################################
 
 log_message "Starting init-kubeadm-cluster.sh script."
-check_prerequisits
+check_prerequisites
 
 log_message "Initializing control-plane node."
 

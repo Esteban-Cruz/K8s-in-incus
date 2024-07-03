@@ -52,14 +52,14 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     log_message "No checks to run."
 }
 
 #########################################################
 # Main Script #
 #########################################################
-check_prerequisits
+check_prerequisites
 log_message "Starting build-control-plane.sh script."
 
 

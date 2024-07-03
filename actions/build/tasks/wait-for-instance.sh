@@ -28,7 +28,7 @@ done
 # Bash functions definition #
 #########################################################
 
-check_prerequisits() {
+check_prerequisites() {
     if [[ $# -gt 0 ]] ; then
         log_error "Arguments are not supported for this script."
         exit 1
@@ -46,7 +46,7 @@ check_prerequisits() {
 # Main Script #
 #########################################################
 
-check_prerequisits
+check_prerequisites
 log_message "Waiting for instance '${INSTANCE_NAME}' to be ready..."
 
 MAX_RETRIES=10

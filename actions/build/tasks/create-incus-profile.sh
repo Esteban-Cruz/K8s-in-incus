@@ -30,7 +30,7 @@ done
 #########################################################
 # Bash functions definition #
 #########################################################
-check_prerequisits() {
+check_prerequisites() {
   if [[ $# -gt 0 ]] ; then
       log_error "Arguments are not supported for this script."
       exit 1
@@ -58,7 +58,7 @@ check_prerequisits() {
 #########################################################
 
 log_message "Attempting to create Incus profile '${PROFILE_NAME}'."
-check_prerequisits
+check_prerequisites
 
 if incus profile show "$PROFILE_NAME" &> /dev/null
 then

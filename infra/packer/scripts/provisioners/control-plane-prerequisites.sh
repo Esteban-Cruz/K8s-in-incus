@@ -42,7 +42,7 @@ root_required() {
     fi
 }
 
-check_prerequisits() {
+check_prerequisites() {
     root_required
 }
 
@@ -51,7 +51,7 @@ check_prerequisits() {
 #########################################################
 
 log_message "Starting control-plane-prerequisites.sh script."
-check_prerequisits
+check_prerequisites
 log_message "Installing kubeadm, kubelet and kubectl."
 log_message "Updating apt package index and install packages needed to use the Kubernetes apt repository"
 DEBIAN_FRONTEND=noninteractive apt update -y
