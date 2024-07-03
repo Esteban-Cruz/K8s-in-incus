@@ -22,6 +22,19 @@ log_info() {
     set -u
 }
 
+log_warning() {
+    local level="WARNING"
+    local message="$1"
+    local timestamp
+    timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
+    local log_entry="[$timestamp] $level - $message"
+
+    if [ $WRITE_TO_LOGFILE = true ]; then
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
+        echo "$log_json" >> "$LOG_FILE"
+    fi
+    echo "$log_entry" >&2
+}
 
 log_error() {
     set +u
