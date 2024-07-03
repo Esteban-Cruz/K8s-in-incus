@@ -7,20 +7,20 @@
 set -euo pipefail
 source ./common/log_functions.sh
 
-declare -a PROFILE_NAME
-declare -a IPV4
-declare -a GATEWAY
+declare PROFILE_NAME
+declare STATIC_ADDRESS
+declare GATEWAY
 
 #########################################################
 # Parse command options #
 #########################################################
-OPTS=$( getopt -ao '' --long profile-name:,ipv4:,gateway: -- "$@" )
+OPTS=$( getopt -ao '' --long profile-name:,static-address:,gateway: -- "$@" )
 eval set -- ${OPTS}
 while true;
 do
   case $1 in
     --profile-name)             PROFILE_NAME="$2"                 ; shift 2       ;;
-    --ipv4)                     IPV4="$2"                         ; shift 2       ;;
+    --static-address)           STATIC_ADDRESS="$2"               ; shift 2       ;;
     --gateway)                  GATEWAY="$2"                      ; shift 2       ;;
     --)                                                             shift; break  ;;
     *) >&2 log_error Unsupported option: $1                       ; exit 1        ;;
@@ -37,7 +37,8 @@ check_prerequisites() {
   fi
 
   if [[ -z "$(incus --version)" ]]; then
-    log_error "It appears that incus is not installed in the system, or could not be found." "It is recommended to use incus version 6.0.0."
+    log_error "It appears that incus is not installed in the system, or could not be found." \
+      "It is recommended to use incus version 6.0.0."
     exit 1
   fi
 
@@ -56,11 +57,13 @@ then
 else
     log_info "Incus profile '${PROFILE_NAME}' does not exist, creating it."
     if ! command_output=$(incus profile create ${PROFILE_NAME} 2>&1 >/dev/null ); then
-      log_error "Failed to create incus profile ${PROFILE_NAME}." "$command_output"
+      log_error "Failed to create incus profile ${PROFILE_NAME}." \
+        "$command_output"
       exit 1
     fi
 fi
 
+log_debug "Adding static address '${STATIC_ADDRESS}' and default gateway '${GATEWAY}' to profile '${PROFILE_NAME}' "
 if ! command_output=$(incus profile edit "${PROFILE_NAME}" <<EOF 2>&1 >/dev/null
 config:
   cloud-init.user-data: |
@@ -72,7 +75,7 @@ config:
       enp5s0: 
         dhcp4: no
         addresses:
-          - ${IPV4}
+          - ${STATIC_ADDRESS}
         routes:
           - to: default
             via: ${GATEWAY}
@@ -94,7 +97,8 @@ devices:
 name: ${PROFILE_NAME}
 EOF
 ); then
-  log_error "Failed to edit incus profile '${PROFILE_NAME}'" "$command_output"
+  log_error "Failed to edit incus profile '${PROFILE_NAME}'" \
+    "$command_output"
   exit 1
 fi
 

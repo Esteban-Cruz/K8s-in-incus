@@ -82,75 +82,77 @@ POD_NETWORK_ADDON="https://reweave.azurewebsites.net/k8s/v1.30/net.yaml"
 #########################################################
 
 check_prerequisites
-log_message "Starting control plain build script."
+log_info "Starting Control plane build script."
 
-./actions/build/tasks/create-incus-profile.sh \
-  --profile-name="${CONTROL_PLANE_HOSTNAME}" \
-  --ipv4="${CONTROL_PLANE_ADDRESS_CIDR}" \
-  --gateway="${DEFAULT_GATEWAY_ADDRESS}"
-
-
-./actions/build/tasks/launch-incus-instance.sh \
-  --image="${CONTROL_PLANE_BASE_IMAGE}" \
-  --hostname="${CONTROL_PLANE_HOSTNAME}" \
-  --profile="${CONTROL_PLANE_HOSTNAME}" \
-  --cpus="${CONTROL_PLANE_CPUS}" \
-  --memory="${CONTROL_PLANE_MEMORY}"
+if ! ./actions/build/tasks/create-incus-profile.sh \
+    --profile-name="${CONTROL_PLANE_HOSTNAME}" \
+    --static-address="${CONTROL_PLANE_ADDRESS_CIDR}" \
+    --gateway="${DEFAULT_GATEWAY_ADDRESS}" ; then
+  log_error "Failed to run script to create incus profile"
+fi
 
 
-./actions/build/tasks/wait-for-instance.sh \
-  --instance-name="${CONTROL_PLANE_HOSTNAME}"
+# ./actions/build/tasks/launch-incus-instance.sh \
+#   --image="${CONTROL_PLANE_BASE_IMAGE}" \
+#   --hostname="${CONTROL_PLANE_HOSTNAME}" \
+#   --profile="${CONTROL_PLANE_HOSTNAME}" \
+#   --cpus="${CONTROL_PLANE_CPUS}" \
+#   --memory="${CONTROL_PLANE_MEMORY}"
 
 
-./actions/incus/incus-exec.sh \
-  --incus-cwd "/tmp/kubeadm/provisioning" \
-  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-  --script "./actions/build/provision-scripts/containerd.sh" \
-  --containerd-version "${CONTROL_PLANE_CONTAINERD_VERSION}"
+# ./actions/build/tasks/wait-for-instance.sh \
+#   --instance-name="${CONTROL_PLANE_HOSTNAME}"
 
 
-./actions/incus/incus-exec.sh \
-  --incus-cwd "/tmp/kubeadm/provisioning" \
-  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-  --script "./actions/build/provision-scripts/network-configurations.sh" \
+# ./actions/incus/incus-exec.sh \
+#   --incus-cwd "/tmp/kubeadm/provisioning" \
+#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+#   --script "./actions/build/provision-scripts/containerd.sh" \
+#   --containerd-version "${CONTROL_PLANE_CONTAINERD_VERSION}"
 
 
-./actions/incus/incus-exec.sh \
-  --incus-cwd "/tmp/kubeadm/provisioning" \
-  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-  --script "./actions/build/provision-scripts/kubernetes-components.sh" \
-  --repository-version "${CONTROL_PLANE_KUBERNETES_REPOSITORY_VERSION}" \
-  --kubeadm "${CONTROL_PLANE_KUBEADM_VERSION}" \
-  --kubelet "${CONTROL_PLANE_KUBELET_VERSION}" \
-  --kubectl "${CONTROL_PLANE_KUBECTL_VERSION}" \
-  --pull-images "true"
+# ./actions/incus/incus-exec.sh \
+#   --incus-cwd "/tmp/kubeadm/provisioning" \
+#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+#   --script "./actions/build/provision-scripts/network-configurations.sh" \
 
 
-./actions/incus/incus-exec.sh \
-  --incus-cwd "/tmp/kubeadm/provisioning" \
-  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-  --script "./actions/build/provision-scripts/init-kubeadm-cluster.sh" \
-  --node-name "${CONTROL_PLANE_HOSTNAME}" \
-  --apiserver-advertise-address "${CONTROL_PLANE_ADDRESS}" \
-  --network-addon "${POD_NETWORK_ADDON}"
+# ./actions/incus/incus-exec.sh \
+#   --incus-cwd "/tmp/kubeadm/provisioning" \
+#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+#   --script "./actions/build/provision-scripts/kubernetes-components.sh" \
+#   --repository-version "${CONTROL_PLANE_KUBERNETES_REPOSITORY_VERSION}" \
+#   --kubeadm "${CONTROL_PLANE_KUBEADM_VERSION}" \
+#   --kubelet "${CONTROL_PLANE_KUBELET_VERSION}" \
+#   --kubectl "${CONTROL_PLANE_KUBECTL_VERSION}" \
+#   --pull-images "true"
 
 
-./actions/incus/incus-exec.sh \
-  --incus-cwd "/tmp/kubeadm/provisioning" \
-  --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-  --script "./actions/build/provision-scripts/customizations.sh"
+# ./actions/incus/incus-exec.sh \
+#   --incus-cwd "/tmp/kubeadm/provisioning" \
+#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+#   --script "./actions/build/provision-scripts/init-kubeadm-cluster.sh" \
+#   --node-name "${CONTROL_PLANE_HOSTNAME}" \
+#   --apiserver-advertise-address "${CONTROL_PLANE_ADDRESS}" \
+#   --network-addon "${POD_NETWORK_ADDON}"
 
-# log_message "Creating stateful snapshot."
-# incus snapshot create ${MASTER_HOSTNAME} ${MASTER_HOSTNAME} --stateful
 
-# log_message "Publishing ${MASTER_HOSTNAME} as image."
-# incus stop ${MASTER_HOSTNAME} --stateful
-# incus publish ${MASTER_HOSTNAME} --alias ${MASTER_HOSTNAME} --reuse --force-local
+# ./actions/incus/incus-exec.sh \
+#   --incus-cwd "/tmp/kubeadm/provisioning" \
+#   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
+#   --script "./actions/build/provision-scripts/customizations.sh"
 
-log_message "Image built!!! :-)"
+# # log_info "Creating stateful snapshot."
+# # incus snapshot create ${MASTER_HOSTNAME} ${MASTER_HOSTNAME} --stateful
+
+# # log_info "Publishing ${MASTER_HOSTNAME} as image."
+# # incus stop ${MASTER_HOSTNAME} --stateful
+# # incus publish ${MASTER_HOSTNAME} --alias ${MASTER_HOSTNAME} --reuse --force-local
+
+# log_info "Image built!!! :-)"
 
 #########################################################
 # Finalization #
 #########################################################
 
-log_message "Control plain built successfully."
+log_info "Control plain built successfully."
