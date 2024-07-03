@@ -19,7 +19,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -47,21 +47,21 @@ check_prerequisites() {
 #########################################################
 
 # check_prerequisites
-log_message "Applying customizations."
+log_info "Applying customizations."
 
-log_message "Removing taint from Control Plane node."
+log_info "Removing taint from Control Plane node."
 kubectl taint node control-plane node-role.kubernetes.io/control-plane:NoSchedule- &> /dev/null \
     || log_error "Could not remove taint from Control Plane node."
 
 # TODO(Esteban Cruz): Does this have to be here?
-log_message "Configuring containerd runtime and image endpoints."
+log_info "Configuring containerd runtime and image endpoints."
 crictl config \
     --set runtime-endpoint=unix:///run/containerd/containerd.sock \
     --set image-endpoint=unix:///run/containerd/containerd.sock
 
 echo "alias k=\"kubectl\"" >> /root/.profile
 
-log_message "Installing package: 'yq'."
+log_info "Installing package: 'yq'."
 add-apt-repository -y ppa:rmescandon/yq
 apt update
 apt install yq -y
@@ -70,5 +70,5 @@ apt install yq -y
 # Finalization #
 #########################################################
 
-log_message "Script 05-customizations.sh completed successfully."
+log_info "Script 05-customizations.sh completed successfully."
 

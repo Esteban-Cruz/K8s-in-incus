@@ -1,0 +1,54 @@
+{"timestamp":"2024-07-03T17:19:08Z","level":"INFO","message":"Starting Control plane build script."}
+{"timestamp":"2024-07-03T17:19:08Z","level":"INFO","message":"Creating and configuring Incus profile 'control-plane'."}
+{"timestamp":"2024-07-03T17:19:08Z","level":"INFO","message":"Incus profile 'control-plane' does not exist, creating it."}
+{"timestamp":"2024-07-03T17:19:08Z","level":"DEBUG","message":"Adding static address '10.125.165.2/24' and default gateway '10.125.165.1' to profile 'control-plane' "}
+{"timestamp":"2024-07-03T17:19:08Z","level":"INFO","message":"Incus profile 'control-plane' configured successfully."}
+{"timestamp":"2024-07-03T17:19:08Z","level":"INFO","message":"Launching Incus instance 'control-plane'."}
+{"timestamp":"2024-07-03T17:19:08Z","level":"DEBUG","message":"Instance details: image=images:ubuntu/22.04/cloud, hostname=control-plane, profile=control-plane, cpus=2, memory=2GiB"}
+{"timestamp":"2024-07-03T17:19:20Z","level":"INFO","message":"Incus instance 'control-plane' launched successfully."}
+{"timestamp":"2024-07-03T17:19:20Z","level":"INFO","message":"Waiting for instance 'control-plane' to be ready."}
+{"timestamp":"2024-07-03T17:19:25Z","level":"INFO","message":"Instance is not ready, retrying in 5 seconds..."}
+{"timestamp":"2024-07-03T17:19:30Z","level":"INFO","message":"Instance is not ready, retrying in 5 seconds..."}
+{"timestamp":"2024-07-03T17:19:35Z","level":"INFO","message":"Instance is not ready, retrying in 5 seconds..."}
+{"timestamp":"2024-07-03T17:19:35Z","level":"INFO","message":"Instance is ready."}
+{"timestamp":"2024-07-03T17:19:35Z","level":"INFO","message":"Install Containerd"}
+{"timestamp":"2024-07-03T17:19:35Z","level":"INFO","message":"Executing script against incus instance"}
+{"timestamp":"2024-07-03T17:19:35Z","level":"DEBUG","message":"Pushing script './actions/build/provision-scripts/containerd.sh' to control-plane:/tmp/kubeadm/provision using uid 0."}
+{"timestamp":"2024-07-03T17:19:35Z","level":"DEBUG","message":"Full path to script inside the control-plane instance: '/tmp/kubeadm/provision/containerd.sh'"}
+{"timestamp":"2024-07-03T17:19:35Z","level":"DEBUG","message":"Constructing the command to execute the script"}
+{"timestamp":"2024-07-03T17:19:35Z","level":"DEBUG","message":"Running against instance control-plane the following command: '/bin/bash -c /tmp/kubeadm/provision/containerd.sh --containerd-version 1.7.12'"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"DEBUG","message":"Removing script from control-plane after its execution"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"INFO","message":"Successfully executed script against incus instance"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"INFO","message":"Configure Incus network"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"INFO","message":"Executing script against incus instance"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"DEBUG","message":"Pushing script './actions/build/provision-scripts/network-configurations.sh' to control-plane:/tmp/kubeadm/provisioning using uid 0."}
+{"timestamp":"2024-07-03T17:19:57Z","level":"DEBUG","message":"Full path to script inside the control-plane instance: '/tmp/kubeadm/provisioning/network-configurations.sh'"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"DEBUG","message":"Constructing the command to execute the script"}
+{"timestamp":"2024-07-03T17:19:57Z","level":"DEBUG","message":"Running against instance control-plane the following command: '/bin/bash -c /tmp/kubeadm/provisioning/network-configurations.sh'"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"DEBUG","message":"Removing script from control-plane after its execution"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"INFO","message":"Successfully executed script against incus instance"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"INFO","message":"Installing kubernetes components"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"INFO","message":"Executing script against incus instance"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"DEBUG","message":"Pushing script './actions/build/provision-scripts/kubernetes-components.sh' to control-plane:/tmp/kubeadm/provisioning using uid 0."}
+{"timestamp":"2024-07-03T17:19:58Z","level":"DEBUG","message":"Full path to script inside the control-plane instance: '/tmp/kubeadm/provisioning/kubernetes-components.sh'"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"DEBUG","message":"Constructing the command to execute the script"}
+{"timestamp":"2024-07-03T17:19:58Z","level":"DEBUG","message":"Running against instance control-plane the following command: '/bin/bash -c /tmp/kubeadm/provisioning/kubernetes-components.sh --repository-version v1.30 --kubeadm 1.30.0-1.1 --kubelet 1.30.0-1.1 --kubectl 1.30.0-1.1 --pull-images true'"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"DEBUG","message":"Removing script from control-plane after its execution"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"INFO","message":"Successfully executed script against incus instance"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"INFO","message":"Initializing Kubernetes cluster with Kubeadm"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"INFO","message":"Executing script against incus instance"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"DEBUG","message":"Pushing script './actions/build/provision-scripts/init-kubeadm-cluster.sh' to control-plane:/tmp/kubeadm/provisioning using uid 0."}
+{"timestamp":"2024-07-03T17:21:22Z","level":"DEBUG","message":"Full path to script inside the control-plane instance: '/tmp/kubeadm/provisioning/init-kubeadm-cluster.sh'"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"DEBUG","message":"Constructing the command to execute the script"}
+{"timestamp":"2024-07-03T17:21:22Z","level":"DEBUG","message":"Running against instance control-plane the following command: '/bin/bash -c /tmp/kubeadm/provisioning/init-kubeadm-cluster.sh --node-name control-plane --apiserver-advertise-address 10.125.165.2 --network-addon https://reweave.azurewebsites.net/k8s/v1.30/net.yaml'"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"DEBUG","message":"Removing script from control-plane after its execution"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"INFO","message":"Successfully executed script against incus instance"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"INFO","message":"Applying customizations"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"INFO","message":"Executing script against incus instance"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"DEBUG","message":"Pushing script './actions/build/provision-scripts/customizations.sh' to control-plane:/tmp/kubeadm/provisioning using uid 0."}
+{"timestamp":"2024-07-03T17:21:38Z","level":"DEBUG","message":"Full path to script inside the control-plane instance: '/tmp/kubeadm/provisioning/customizations.sh'"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"DEBUG","message":"Constructing the command to execute the script"}
+{"timestamp":"2024-07-03T17:21:38Z","level":"DEBUG","message":"Running against instance control-plane the following command: '/bin/bash -c /tmp/kubeadm/provisioning/customizations.sh'"}
+{"timestamp":"2024-07-03T17:21:54Z","level":"DEBUG","message":"Removing script from control-plane after its execution"}
+{"timestamp":"2024-07-03T17:21:54Z","level":"INFO","message":"Successfully executed script against incus instance"}
+{"timestamp":"2024-07-03T17:21:54Z","level":"INFO","message":"Control Plane built successfully!!! :-)"}

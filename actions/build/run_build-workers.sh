@@ -24,7 +24,7 @@ INCUS_PROFILE_NAME="control-plane"
 # Bash functions definition #
 #########################################################
 
-log_message() {
+log_info() {
     local datetime
     datetime=$(date +"%Y-%m-%d %H:%M:%S")
     echo "${datetime} - $1"
@@ -44,14 +44,14 @@ root_required() {
 }
 
 check_prerequisites() {
-    log_message "No checks to run."
+    log_info "No checks to run."
 }
 
 #########################################################
 # Main Script #
 #########################################################
 check_prerequisites
-log_message "Starting run_build-workers.sh script."
+log_info "Starting run_build-workers.sh script."
 
 for i in $(seq 1 $max_iteration)
 do
@@ -63,5 +63,5 @@ done
 # Finalization #
 #########################################################
 
-log_message "Script run_build-workers.sh completed successfully."
+log_info "Script run_build-workers.sh completed successfully."
 
