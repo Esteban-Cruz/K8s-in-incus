@@ -13,7 +13,7 @@ declare GATEWAY
 # Parse command options #
 #########################################################
 
-OPTS=$( getopt -ao '' --long profile-name:,static-address:,gateway: -- "$@" )
+OPTS=$( getopt -ao '' --long profile-name:,network-name:,static-address:,gateway: -- "$@" )
 eval set -- ${OPTS}
 while true;
 do
