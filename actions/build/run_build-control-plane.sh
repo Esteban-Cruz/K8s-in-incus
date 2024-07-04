@@ -14,6 +14,10 @@
 #########################################################
 set -euo pipefail
 
+export LOG_DIR="./logs/"
+export LOG_FILE="${LOG_DIR}/kubernetes-in-incus-$(date +"%Y%m%d").log"
+export WRITE_TO_LOGFILE=true
+export DEBUG=true
 #########################################################
 # Bash functions definition #
 #########################################################
@@ -47,8 +51,16 @@ get_nextip(){
     echo "$next_ip"
 }
 
+is_incus_installed() {
+  if [[ -z "$(incus --version)" ]]; then
+    log_error "It appears that incus is not installed in the system, or could not be found." \
+      "It is recommended to use incus version 6.0.0."
+    exit 1
+  fi
+}
+
 check_prerequisites() {
-  true
+  is_incus_installed
 }
 
 #########################################################
@@ -86,6 +98,7 @@ log_info "Starting Control plane build script."
 
 if ! ./actions/incus/create-profile.sh \
   --profile-name="${CONTROL_PLANE_HOSTNAME}" \
+  --network-name="${NETWORK_NAME}" \
   --static-address="${CONTROL_PLANE_ADDRESS_CIDR}" \
   --gateway="${DEFAULT_GATEWAY_ADDRESS}"; 
 then
@@ -108,11 +121,11 @@ fi
 
 ./actions/incus/wait-for-instance.sh \
   --instance-name="${CONTROL_PLANE_HOSTNAME}" \
-  --max-retries=10;
+  --max-retries=10
 
 
 log_info "Install Containerd"
-./actions/incus/incus-exec.sh \
+./actions/incus/exec-script.sh \
   --incus-cwd "/tmp/kubeadm/provision" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/containerd.sh" \
@@ -120,14 +133,14 @@ log_info "Install Containerd"
 
 
 log_info "Configure Incus network"
-./actions/incus/incus-exec.sh \
+./actions/incus/exec-script.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
-  --script "./actions/build/provision-scripts/network-configurations.sh" \
+  --script "./actions/build/provision-scripts/network-configurations.sh"
 
 
 log_info "Installing kubernetes components"
-./actions/incus/incus-exec.sh \
+./actions/incus/exec-script.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/kubernetes-components.sh" \
@@ -139,7 +152,7 @@ log_info "Installing kubernetes components"
 
 
 log_info "Initializing Kubernetes cluster with Kubeadm"
-./actions/incus/incus-exec.sh \
+./actions/incus/exec-script.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/init-kubeadm-cluster.sh" \
@@ -149,7 +162,7 @@ log_info "Initializing Kubernetes cluster with Kubeadm"
 
 
 log_info "Applying customizations"
-./actions/incus/incus-exec.sh \
+./actions/incus/exec-script.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/customizations.sh"

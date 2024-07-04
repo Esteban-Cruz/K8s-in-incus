@@ -19,6 +19,7 @@ while true;
 do
   case $1 in
     --profile-name)             PROFILE_NAME="$2"                 ; shift 2       ;;
+    --network-name)             NETWORK_NAME="$2"                 ; shift 2       ;;
     --static-address)           STATIC_ADDRESS="$2"               ; shift 2       ;;
     --gateway)                  GATEWAY="$2"                      ; shift 2       ;;
     --)                                                             shift; break  ;;
@@ -89,7 +90,7 @@ description: ${PROFILE_NAME} profile
 devices:
   eth0:
     name: eth0
-    network: incusbr0
+    network: ${NETWORK_NAME}
     type: nic
   root:
     path: /
