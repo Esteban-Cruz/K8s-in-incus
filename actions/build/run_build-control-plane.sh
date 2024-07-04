@@ -16,8 +16,8 @@ set -euo pipefail
 
 export LOG_DIR="./logs/"
 export LOG_FILE="${LOG_DIR}/kubernetes-in-incus-$(date +"%Y%m%d").log"
-export WRITE_TO_LOGFILE=true
-export DEBUG=true
+export WRITE_TO_LOGFILE=false
+export DEBUG=false
 #########################################################
 # Bash functions definition #
 #########################################################

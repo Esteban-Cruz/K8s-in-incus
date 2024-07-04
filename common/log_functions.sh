@@ -1,8 +1,5 @@
 #!/bin/bash
 
-LOG_DIR="./logs"
-LOG_FILE="${LOG_DIR}/kubernetes-in-incus-$(date +"%Y%m%d").log"
-WRITE_TO_LOGFILE=true
 
 log_info() {
     set +u
@@ -13,7 +10,7 @@ log_info() {
     timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
     local raw_log="[$timestamp] $level - $message"
 
-    if [ $WRITE_TO_LOGFILE = true ]; then
+    if [ "$WRITE_TO_LOGFILE" = true ]; then
         local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
         echo "$log_json" >> "$LOG_FILE"
     fi
@@ -23,17 +20,21 @@ log_info() {
 }
 
 log_warning() {
+    set +u
+
     local level="WARNING"
     local message="$1"
     local timestamp
     timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
     local log_entry="[$timestamp] $level - $message"
 
-    if [ $WRITE_TO_LOGFILE = true ]; then
+    if [ "$WRITE_TO_LOGFILE" = true ]; then
         local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\"}"
         echo "$log_json" >> "$LOG_FILE"
     fi
     echo "$log_entry" >&2
+
+    set -u
 }
 
 log_error() {
@@ -52,7 +53,7 @@ log_error() {
     timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
     local log_raw="[$timestamp] $level - $message $log_details"
 
-    if [ $WRITE_TO_LOGFILE = true ]; then
+    if [ "$WRITE_TO_LOGFILE" = true ]; then
         local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"details\":\"$details\"}"
         echo "$log_json" >> "$LOG_FILE"
     fi
