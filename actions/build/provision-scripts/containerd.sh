@@ -14,7 +14,7 @@
 #########################################################
 
 set -euo pipefail
-declare -a CONTAINERD_VERSION
+declare CONTAINERD_VERSION
 
 #########################################################
 # Bash functions definition #
@@ -41,6 +41,11 @@ root_required() {
 }
 
 check_prerequisites() {
+    if [ -z "$CONTAINERD_VERSION" ]; then
+        log_error "Missing required argument: --containerd-version"
+        exit 1
+    fi
+
     root_required
 }
 

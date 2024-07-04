@@ -8,7 +8,7 @@ set -euo pipefail
 declare IMAGE
 declare INSTANCE_HOSTNAME
 declare PROFILE
-declare CPUS=2
+declare -i CPUS=2
 declare MEMORY="2000MiB"
 
 #########################################################
