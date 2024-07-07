@@ -24,7 +24,7 @@ export DEBUG=false
 #########################################################
 
 source ./common/log_functions.sh
-source ./actions/incus/functions.sh
+source ./actions/incus/helpers/functions.sh
 
 #########################################################
 # DEFAULTS #
@@ -32,6 +32,7 @@ source ./actions/incus/functions.sh
 # -------------------------------------------------------
 # Control Plane settings #
 # -------------------------------------------------------
+
 # Incus
 DESIRED_INCUS_VERSION="6.0.0"
 CONTROL_PLANE_BASE_IMAGE="images:ubuntu/22.04/cloud"
@@ -135,6 +136,7 @@ fi
 # ------------------------------------
 # Control Plane Provisioning Section #
 # ------------------------------------
+
 # Install and configure Containerd
 ./actions/incus/exec-script.sh \
   --incus-cwd "/tmp/kubeadm/provisioning" \
@@ -174,10 +176,10 @@ log_info "Applying customizations"
   --instance-name "${CONTROL_PLANE_HOSTNAME}" \
   --script "./actions/build/provision-scripts/customizations.sh"
 
-
 # -------------------------------------------------------
 # Worker Nodes Section #
 # -------------------------------------------------------
+
 for (( i = 1; i <= $NO_WORKER_NODES; i++ ))
 do
     worker_hostname="worker-$i"
@@ -191,7 +193,6 @@ do
     worker_address="$command_output"
     worker_cidr_address="${worker_address}/${network_submask}"
     log_info "IP address $worker_cidr_address will be assigned to the worker node '${worker_hostname}'"
-
 
     # Create incus profile for worker node
     if ! ./actions/incus/create-profile.sh \
@@ -224,6 +225,7 @@ do
     # ------------------------------------
     # Worker Provisioning Section #
     # ------------------------------------
+
     # Install and configure Containerd
     ./actions/incus/exec-script.sh \
       --incus-cwd "/tmp/kubeadm/provisioning" \
@@ -257,6 +259,7 @@ do
         exit 1
       fi
     fi
+
     log_info "Worker node ${worker_hostname} joined the cluster successfully"
 done
 

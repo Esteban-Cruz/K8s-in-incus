@@ -14,11 +14,11 @@
 #########################################################
 set -eo pipefail
 
-declare -a KUBERNETES_REPOSITORY_VERSION
-declare -a KUBEADM_VERSION
-declare -a KUBELET_VERSION
-declare -a KUBECTL_VERSION
-declare -a PULL_IMAGES="false"
+declare KUBERNETES_REPOSITORY_VERSION
+declare KUBEADM_VERSION
+declare KUBELET_VERSION
+declare KUBECTL_VERSION
+declare PULL_IMAGES="false"
 export DEBIAN_FRONTEND=noninteractive
 
 #########################################################

@@ -17,9 +17,9 @@ set -euo pipefail
 # NODE_NAME="control-plane"
 # APISERVER_ADVERTISE_ADDRESS="10.125.165.10"
 # POD_NETWORK_ADDON="https://reweave.azurewebsites.net/k8s/v1.30/net.yaml"
-declare -a NODE_NAME
-declare -a APISERVER_ADVERTISE_ADDRESS
-declare -a POD_NETWORK_ADDON
+declare NODE_NAME
+declare APISERVER_ADVERTISE_ADDRESS
+declare POD_NETWORK_ADDON
 
 #########################################################
 # Parse command options #
