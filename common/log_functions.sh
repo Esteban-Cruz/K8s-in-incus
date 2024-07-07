@@ -2,8 +2,6 @@
 
 
 log_info() {
-    set +u
-
     local level="INFO"
     local message="$1"
     local timestamp
@@ -15,13 +13,9 @@ log_info() {
         echo "$log_json" >> "$LOG_FILE"
     fi
     echo "$raw_log"
-
-    set -u
 }
 
 log_warning() {
-    set +u
-
     local level="WARNING"
     local message="$1"
     local timestamp
@@ -33,38 +27,40 @@ log_warning() {
         echo "$log_json" >> "$LOG_FILE"
     fi
     echo "$log_entry" >&2
-
-    set -u
 }
 
-log_error() {
-    set +u
-    
+log_error() {    
     local level="ERROR"
     local message="$1"
     local details="$2"
 
     local log_details=""
     if [ -n "$details" ]; then
-        log_details=", details: $details"
+        log_details="Details: $details"
     fi
 
     local timestamp
     timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
-    local log_raw="[$timestamp] $level - $message $log_details"
+
+    local caller_func="${FUNCNAME[1]}"
+    local caller_lineno="${BASH_LINENO}"
+    local caller_file="${BASH_SOURCE[1]}"
+
+    local log_entry="[${timestamp}] ${level} - $message ($caller_file: line: $caller_lineno)"
+
+    if [ -n "$log_details" ]; then
+        log_entry+=" - ${log_details}"
+    fi
 
     if [ "$WRITE_TO_LOGFILE" = true ]; then
-        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"details\":\"$details\"}"
+        local log_json="{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"details\":\"$details\",\"function\":\"$caller_func\",\"line\":\"$caller_lineno\",\"file\":\"$caller_file\"}"
         echo "$log_json" >> "$LOG_FILE"
     fi
-    echo "$log_raw" >&2
 
-    set -u
+    echo "$log_entry" >&2
 }
 
-
 log_debug() {
-    set +u
     if [ "$DEBUG" = true ]; then
         local level="DEBUG"
         local message="$1"
@@ -78,5 +74,4 @@ log_debug() {
         fi
         echo "$log_raw"
     fi
-    set -u
 }
