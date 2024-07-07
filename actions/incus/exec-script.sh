@@ -72,7 +72,7 @@ check_prerequisites() {
 #########################################################
 
 check_prerequisites
-log_info "Executing script against incus instance"
+log_info "Executing script '${SCRIPT}' against incus instance"
 
 remote_script="${INCUS_CWD}/$(basename "${SCRIPT}")"
 
@@ -107,4 +107,4 @@ fi
 # Finalization #
 #########################################################
 
-log_info "Successfully executed script against incus instance"
+log_info "Successfully executed script '${SCRIPT}' against incus instance"
