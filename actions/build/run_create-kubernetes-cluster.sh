@@ -33,6 +33,9 @@ source ./actions/incus/helpers/functions.sh
 # Control Plane settings #
 # -------------------------------------------------------
 
+# YQ
+DESIRED_YQ_VERSION="4.2.0"
+
 # Incus
 DESIRED_INCUS_VERSION="6.0.0"
 CONTROL_PLANE_BASE_IMAGE="images:ubuntu/22.04/cloud"
@@ -56,6 +59,20 @@ NO_WORKER_NODES=1
 # -------------------------------------------------------
 # Global configuration #
 # -------------------------------------------------------
+
+log_info "Verifying yq installation"
+if ! command_output=$(is_yq_installed 2>&1); then
+  log_error "$command_output"
+  exit 1
+fi
+log_info "yq is installed on the system"
+
+log_info "Verifying desired yq version"
+if ! command_output=$(is_yq_version "$DESIRED_YQ_VERSION" 2>&1); then
+  log_error "$command_output"
+  exit 1
+fi
+log_info "yq version ${DESIRED_YQ_VERSION} is installed on the system"
 
 log_info "Veryfying incus installation"
 if ! command_output=$(is_incus_installed 2>&1); then

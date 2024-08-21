@@ -5,6 +5,42 @@ set -o pipefail
 source ./common/log_functions.sh
 
 
+# Check if yq is installed and accessible.
+# Usage: is_yq_installed
+# Returns: 0 if yq is installed and accessible, non-zero otherwise.
+is_yq_installed() {
+    if ! command_output=$(yq --version &> /dev/null); then
+        echo "yq is not installed on the system"
+        return 1
+    fi
+}
+
+
+# Check if installed yq version matches the desired version.
+# Usage: is_yq_version <desired_version>
+# Returns: Return 0 if the desired version of yq is installed, return 1 otherwise
+is_yq_version() {
+    local desired_version="$1"
+    if [ -z "$desired_version" ]; then
+        echo "No desired yq version was provided"
+        return 1
+    fi
+
+    log_debug "Verifying yq version ${desired_version} is installed"
+    local current_version
+    if ! command_output=$(yq --version | awk '{ print $3 }' 2>&1); then
+        echo "$command_output"
+        return 1
+    fi
+
+    local current_version=$command_output
+    if [ "$current_version" != "$desired_version" ]; then
+        echo "yq version $desired_version is not present"
+        return 1
+    fi
+}
+
+
 # Check if incus command is installed and accessible.
 # Usage: is_incus_installed
 # Returns: 0 if incus is installed and accessible, non-zero otherwise.
